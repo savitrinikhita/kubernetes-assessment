@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+spec:
+  storageClassName: nodestorage
+  capacity:
+    storage: 10Gi #thin provision not thick. 
+  accessModes:
+    - ReadWriteOnce #ReadWriteMany #Read
+  hostPath:
+    path: /mnt/data
