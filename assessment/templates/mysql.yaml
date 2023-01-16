@@ -1,0 +1,41 @@
+#once you create a manifest file to apply the manifest file 
+#kubectl apply -f nameoftheyamlfile
+apiVersion: apps/v1 #it invoke tha api version apps/v1
+kind: Deployment #we are invoking Deployment api Deployment is unique
+metadata: #when it create a deploy ment 
+  name: mysql  #using metadata we are giving the name 
+  labels:
+    app: mysql  
+spec: #Deployment Specification
+  replicas: 1 #three pod one it create three pod how deployment is going to be mapped with all this three pod
+  selector: #key value
+    matchLabels: #all this three pod will have label
+      app: mysql  #line 10 to 13 line this is for the Pod
+  template: #inside your pod it should create container before that it should download the image inside your pod
+    metadata:
+      labels:
+        app: mysql  #same label should be define which we have define in line 13
+    spec: #container specification
+      containers:
+      - name: mysql #list in python
+        image: mysql:5.6 #this is the image whcih is going to be deployed
+        env: #password for your database
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-db-password
+                key: db-password
+        ports:
+        - containerPort: 3306 #internal container port
+        volumeMounts: #inside your container this is the path of your storage
+          - name: mysql-persistent-storage
+            mountPath: /var/lib/mysql #this is the storage path inside your container
+          - name: usermanagement-db-creation-script
+            mountPath: /docker-entrypoint-initdb.d  #i want to upload my configmap 
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: task-pv-claim #claim
+        - name: usermanagement-db-creation-script
+          configMap:
+            name: usermanagement-db-creation-script #mapped with configmap
